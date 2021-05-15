@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index1.css">
+    <title>암호프로그램</title>
+</head>
+<body style="font-size: 15;">
+    <div class="box1">
+        <h1>암호 프로그램</h1>
+        <div class="box2">
+            <text style="margin-left:20%;margin-top:5%;">암호키 입력:  <input class="inputid1" type="text" id="key" style="margin-top:5%;" placeholder="암호키를 입력해주세요"> </text><br>
+            <text style="margin-left:20%;"></text>암호화 할 문장: <input type="text" class="inputid2" id="sentence" placeholder="암호화 할 문장 입력해주세요"> </text><br>
+            <br>
+            
+            <button type="button" style="margin-left:40%;" id="GoBtn">Next</button>
+            <!-- <table id="tbl" style="border:1px solid black; width:45%; height:70%;margin-top:2%;margin-left:3%; text-align: center;">
+                <tr>
+                    <td>'</td>
+                    <td>.</td>
+                    <td>.</td>
+                    <td>.</td>
+                    <td>.</td>
+                </tr>
+                <tr>
+                    <td>.</td>
+                    <td>'</td>
+                    <td>'</td>
+                    <td>.</td>
+                    <td>.</td>
+                </tr>
+                <tr>
+                    <td>.</td>
+                    <td>.</td>
+                    <td>.</td>
+                    <td>.</td>
+                    <td>.</td>
+                </tr>
+                <tr>
+                    <td>.</td>
+                    <td>.</td>
+                    <td>.</td>
+                    <td>.</td>
+                    <td>.</td>
+                </tr>
+                <tr>
+                    <td>.</td>
+                    <td>.</td>
+                    <td>.</td>
+                    <td>.</td>
+                    <td>.</td>
+                </tr>
+            </table> -->
+        </div>
+    </div>
+    <script>
+        function showPopup() { window.open("index.html", "a", "width=1200, height=1000, left=100, top=50"); }
+        let alphabetBoard=Array.from(Array(5), () => Array(5).fill(null));
+        let oddFlag=false; 
+        let isZ='';
+        let blank = 0; //blankCheck과 동일
+        let key=document.getElementById("key");
+        let scStr=document.getElementById("sentence"); //str
+        let nextBtn=document.getElementById("GoBtn");
+        let encryption =''; //암호화
+        let show=document.getElementById("showText");
+        nextBtn.addEventListener('click',GoBtnclick);
+        function GoBtnclick(){
+            
+            if(key.value==='' && scStr.value===''){
+                alert("암호키와 문장이 입력되지 않았습니다!! F5키를 눌러주세요");
+            }else if(key.value===''){
+                alert("암호키가 입력되지 않았습니다!! F5키를 눌러주세요");
+            }else if(scStr.value===''){
+                alert("문장이 입력되지 않았습니다!! F5키를 눌러주세요");
+            }else{
+                alert('암호화 과정으로 넘어갑니다....');   
+            }
+
+            scStr=scStr.value;
+            for(let i=0;i<scStr.length;i++){
+                if(scStr.charAt(i)===' '){ //공백제거
+                    scStr=scStr.substring(0,i)+scStr.substring(i+1,scStr.length);
+                    blank+=10;
+                }else{
+                    blank+=0;
+                }
+                if(scStr.charAt(i)==='z'){
+                    scStr=scStr.substring(0,i)+'q'+scStr.substring(i+1,scStr.length);
+                    isZ+=1;
+                }else{
+                    isZ+=0;
+                }
+            }
+
+            setBoard(key.value);
+            encryption=setEncryption(key.value.toLowerCase(),scStr.toLowerCase());
+            
+            document.write(encryption+"<br>");
+        }
+
+
+        function setEncryption(scKey,scStr){
+            let playFair=[];
+            let encPlayFair=[];
+            let x1=0,x2=0, y1=0, y2=0;
+		    let encStr ='';
+            let tmpArr=[0,0];
+            for(let i=0;i<scStr.length;i+=2){
+                let tmpArr=[0,0];
+                tmpArr[0]=scStr.charAt(i);
+                if(scStr.charAt(i)===scStr.charAt(i+1)){
+                    tmpArr[1]='x';
+                    i--;
+                }else{
+                    tmpArr[1]=scStr.charAt(i+1);
+                }
+
+                if(i===scStr.length-1){
+                    tmpArr[1]='x';
+                    oddFlag=true;
+                }
+
+                playFair.push(tmpArr);
+            }
+
+            document.write(playFair+"<br>");
+
+            for(let i=0;i<playFair.length;i++){
+                let tmpArr2=[0,0];
+                for(let j=0;j<alphabetBoard.length;j++){
+                    for(let k=0;k<alphabetBoard[j].length;k++){
+                        if(alphabetBoard[j][k]===playFair[i][0]){
+                            x1=j;
+                            y1=k;
+                        }
+                        if(alphabetBoard[j][k]===playFair[i][1]){
+                            x2=j;
+                            y2=k;
+                        }
+                    }
+                }
+
+                if(x1===x2) //행이 같은경우
+                {
+                    tmpArr2[0] = alphabetBoard[x1][(y1+1)%5];
+                    tmpArr2[1] = alphabetBoard[x2][(y2+1)%5];
+                }
+                else if(y1===y2) //열이 같은 경우
+                {
+                    tmpArr2[0] = alphabetBoard[(x1+1)%5][y1];
+                    tmpArr2[1] = alphabetBoard[(x2+1)%5][y2];
+                } 
+                else //행, 열 모두 다른경우
+                {
+                    tmpArr2[0] = alphabetBoard[x2][y1];
+                    tmpArr2[1] = alphabetBoard[x1][y2];
+                }
+                
+                encPlayFair.push(tmpArr2);
+            }
+            
+            for(let i=0;i<encPlayFair.length;i++){
+                encStr+=encPlayFair[i][0]+""+encPlayFair[i][1]+" ";
+            }
+
+            return encStr;
+        }
+
+
+        function setBoard(key){
+            //let uniqueKey=""; //중복된 문자가 제거된 문자열 저장 keyForSet과 동일
+            let duplicationFlag=false; //중복확인
+            let keylength=0;
+
+            key+='abcdefghijklmnopqrstuvwxyz';
+
+            let uniqueKey= key.split('').filter((e,idx)=>idx === key.indexOf(e)).join('');
+
+            for(let i = 0 ; i < alphabetBoard.length ; i++ )
+		    {
+                for(let j = 0; j <alphabetBoard[i].length ; j++ )
+                {
+                    alphabetBoard[i][j] = uniqueKey.charAt(keylength++);
+                }
+        
+		    }	
+
+            document.write("[알파벳 판] <br>"); 
+            for(let i=0;i<alphabetBoard.length;i++){
+                for(let j=0;j<alphabetBoard[i].length;j++){
+                    document.write(" " +alphabetBoard[i][j]+" ");
+                }
+                document.write("<br>");
+            }
+            document.write("--------------------- <br>")
+            
+        }
+    </script>
+</body>
+</html>
